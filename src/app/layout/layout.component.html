@@ -1,0 +1,19 @@
+<nav class="navbar navbar-dark bg-success">
+  <span class="navbar-brand mx-auto">Alumnos Proyecto Final</span>
+</nav>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 h-100">
+      <div class="list-group d-flex flex-column justify-content-center">
+        <a routerLink="/alumnos" routerLinkActive="active" class="list-group-item list-group-item-action ">Lista de Alumnos</a>
+        <a routerLink="/alumnos/abm" routerLinkActive="active" class="list-group-item list-group-item-action">ABM de Alumnos</a>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <br>
+      <br>
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

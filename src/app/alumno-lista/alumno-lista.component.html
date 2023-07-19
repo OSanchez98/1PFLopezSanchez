@@ -1,0 +1,13 @@
+<table class="table">
+    <thead>
+      <tr>
+        <th>Nombre Completo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let alumno of alumnos">
+        <td>{{ alumno | nombreCompleto }}</td>
+      </tr>
+    </tbody>
+  </table>
+  

@@ -1,0 +1,62 @@
+<form [formGroup]="formulario" (ngSubmit)="guardarAlumno()">
+  <div class="form-group">
+    <label for="nombre">Nombre:</label>
+    <input type="text" class="form-control" id="nombre" formControlName="nombre"
+      [class.is-invalid]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
+    <div *ngIf="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched" class="invalid-feedback is-invalid">
+      <div *ngIf="formulario.get('nombre')?.hasError('required')">El nombre es requerido.</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="apellido">Apellido:</label>
+    <input type="text" class="form-control" id="apellido" formControlName="apellido"
+      [class.is-invalid]="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched">
+    <div *ngIf="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched"
+      class="invalid-feedback is-invalid">
+      <div *ngIf="formulario.get('apellido')?.hasError('required')">El Apellido es requerido.</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="email" class="form-label">Email:</label>
+    <input type="email" class="form-control" id="email" formControlName="email"
+      [class.is-invalid]="formulario.get('email')?.invalid && formulario.get('email')?.touched">
+    <div *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched"
+      class="invalid-feedback is-invalid">
+      <div *ngIf="formulario.get('email')?.hasError('required')">El email es requerido.</div>
+      <div *ngIf="formulario.get('email')?.hasError('email')">El email no es válido.</div>
+    </div>
+  </div>
+
+  <br>
+  <br>
+
+  <button *ngIf="alumnoSeleccionado" type="submit" class="btn btn-primary m-3">Editar</button>
+  <button *ngIf="!alumnoSeleccionado" type="submit" class="btn btn-primary m-3">Guardar</button>
+  <button type="button" class="btn btn-secondary" (click)="limpiarFormulario()">Limpiar</button>
+</form>
+
+<table class="table">
+  <thead>
+    <tr appTitulo>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Correo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let alumno of alumnos">
+      <td>{{ alumno.id }}</td>
+      <td>{{ alumno.nombre }}</td>
+      <td>{{ alumno.apellido }}</td>
+      <td>{{ alumno.email }}</td>
+      <td>
+        <button class="btn btn-sm btn-info m-3" (click)="editarAlumno(alumno)">Editar</button>
+        <button class="btn btn-sm btn-danger" (click)="eliminarAlumno(alumno)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

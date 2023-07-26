@@ -1,4 +1,4 @@
-<form [formGroup]="formulario" (ngSubmit)="guardarAlumno()">
+<form [formGroup]="formulario" (ngSubmit)="alumnoSeleccionado ? modificarAlumno() : guardarAlumno()">
   <div class="form-group">
     <label for="nombre">Nombre:</label>
     <input type="text" class="form-control" id="nombre" formControlName="nombre"
@@ -32,8 +32,11 @@
   <br>
   <br>
 
-  <button *ngIf="alumnoSeleccionado" type="submit" class="btn btn-primary m-3">Editar</button>
-  <button *ngIf="!alumnoSeleccionado" type="submit" class="btn btn-primary m-3">Guardar</button>
+  <button *ngIf="alumnoSeleccionado; else agregarBoton" type="submit" class="btn btn-primary m-3">Editar</button>
+  <ng-template #agregarBoton>
+    <button type="submit" class="btn btn-primary m-3">Guardar</button>
+  </ng-template>
+
   <button type="button" class="btn btn-secondary" (click)="limpiarFormulario()">Limpiar</button>
 </form>
 
@@ -48,7 +51,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let alumno of alumnos">
+    <tr *ngFor="let alumno of (alumnos$ | async)">
       <td>{{ alumno.id }}</td>
       <td>{{ alumno.nombre }}</td>
       <td>{{ alumno.apellido }}</td>

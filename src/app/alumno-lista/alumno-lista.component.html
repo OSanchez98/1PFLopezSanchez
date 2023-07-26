@@ -1,13 +1,19 @@
 <table class="table">
-    <thead>
-      <tr>
-        <th>Nombre Completo</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let alumno of alumnos">
-        <td>{{ alumno | nombreCompleto }}</td>
-      </tr>
-    </tbody>
-  </table>
-  
+  <thead>
+    <tr>
+      <th>Nombre Completo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let alumno of (alumnos$ | async)">
+      <td>{{ alumno.id }}</td>
+      <td>{{ alumno | nombreCompleto }}</td>
+    </tr>
+  </tbody>
+</table>
+<form [formGroup]="searchForm">
+  <div class="form-group">
+    <label for="search">Buscar Alumnos:</label>
+    <input type="text" class="form-control" id="search" formControlName="search">
+  </div>
+</form>

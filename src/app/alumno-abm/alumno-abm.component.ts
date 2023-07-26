@@ -1,96 +1,86 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Alumno } from '../interfaces/alumno.interface';
+import { AlumnoService } from '../services/alumno.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-alumno-abm',
   templateUrl: './alumno-abm.component.html',
-  styleUrls: ['./alumno-abm.component.css']
+  styleUrls: ['./alumno-abm.component.css'],
 })
-export class AlumnoAbmComponent {
-  @Output() alumnosActualizados = new EventEmitter<Alumno[]>();
-
+export class AlumnoAbmComponent implements OnDestroy {
+  alumnos$: Observable<Alumno[]>;
+  private alumnosSubscription: Subscription | undefined;
+  
   alumnoSeleccionado: Alumno | null = null;
-
   formulario: FormGroup;
-  alumnos: Alumno[] = [
-    { id: 1, nombre: 'Juan', apellido: 'Pérez', email: 'juanPerez@hotmail.com' },
-    { id: 2, nombre: 'María', apellido: 'Gómez', email: 'MGomez@hotmal.com' },
-    { id: 3, nombre: 'Pedro', apellido: 'López', email: 'Pedro06@gmail.com' }
-  ];
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private alumnoService: AlumnoService) {
+    this.alumnos$ = this.alumnoService.getAlumnos();
+
     this.formulario = this.formBuilder.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      email: ['']
+      email: ['', [Validators.required, Validators.email]],
     });
+    this.alumnosSubscription = this.alumnos$.subscribe();
   }
 
   guardarAlumno(): void {
     if (this.formulario.valid) {
       const alumno: Alumno = {
-        id: this.alumnoSeleccionado ? this.alumnoSeleccionado.id : this.getNextId(),
+        id: this.getNextId(),
+        nombre: this.formulario.get('nombre')?.value,
+        apellido: this.formulario.get('apellido')?.value,
+        email: this.formulario.get('email')?.value,
+      };
+
+      this.alumnoService.agregarAlumno(alumno);
+      this.limpiarFormulario();
+    }
+  }
+
+  editarAlumno(alumno: Alumno): void {
+    this.alumnoSeleccionado = alumno;
+    this.formulario.patchValue({
+      nombre: alumno.nombre,
+      apellido: alumno.apellido,
+      email: alumno.email
+    });
+  }
+
+  modificarAlumno(): void {
+    if (this.formulario.valid && this.alumnoSeleccionado) {
+      const alumnoModificado: Alumno = {
+        id: this.alumnoSeleccionado.id,
         nombre: this.formulario.get('nombre')?.value,
         apellido: this.formulario.get('apellido')?.value,
         email: this.formulario.get('email')?.value
       };
-  
-      if (this.alumnoSeleccionado) {
-        const index = this.alumnos.findIndex(a => a.id === this.alumnoSeleccionado!.id);
-        if (index !== -1) {
-          this.alumnos[index] = alumno;
-        }
-      } else {
-        this.alumnos.push(alumno);
-      }
-  
-      this.alumnosActualizados.emit(this.alumnos);
+
+      this.alumnoService.modificarAlumno(alumnoModificado);
       this.limpiarFormulario();
       this.alumnoSeleccionado = null;
     }
   }
 
+  eliminarAlumno(alumno: Alumno): void {
+    this.alumnoService.borrarAlumno(alumno);
+  }
+
   limpiarFormulario(): void {
     this.formulario.reset();
+    this.alumnoSeleccionado = null;
   }
-
-  editarAlumno(alumno: Alumno): void {
-    this.alumnoSeleccionado = alumno;
-    this.formulario.setValue({
-      nombre: alumno.nombre,
-      apellido: alumno.apellido,
-      email: alumno.email
-    });
-  } 
-
-  eliminarAlumno(alumno: Alumno): void {
-    const index = this.alumnos.findIndex(a => a.id === alumno.id);
-    if (index !== -1) {
-      this.alumnos.splice(index, 1);
-      this.alumnosActualizados.emit(this.alumnos);
-      if (this.alumnoSeleccionado && this.alumnoSeleccionado.id === alumno.id) {
-        this.limpiarFormulario();
-        this.alumnoSeleccionado = null;
-      }
-    }
-  }
-
+  
   getNextId(): number {
-    const maxId = Math.max(...this.alumnos.map(a => a.id), 0);
-    return maxId + 1;
+    return this.alumnoService.getNextId();
   }
 
-  modificarAlumno(alumno: Alumno): void {
-    const index = this.alumnos.findIndex(a => a.id === alumno.id);
-    if (index !== -1) {
-      this.alumnos[index] = alumno;
+  ngOnDestroy(): void {
+    if (this.alumnosSubscription) {
+      this.alumnosSubscription.unsubscribe();
     }
   }
-  
-
-  
-
-  
-
 }
